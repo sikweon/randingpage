@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "콩즈 라이프스타일 스토어",
+  title: "콩즈쥬스",
   description: "당신의 일상에 특별한 경험을 더합니다",
   robots: "noindex, nofollow",
 };
