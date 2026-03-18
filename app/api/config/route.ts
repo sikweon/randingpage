@@ -43,30 +43,27 @@ export async function GET() {
 
 export async function PUT(request: NextRequest) {
   try {
-    const body = await request.json();
-    const password = body._password || request.headers.get("x-admin-password");
+    const password = request.headers.get("x-admin-password");
     const adminPassword = process.env.ADMIN_PASSWORD || "zhdwmzhdwm!23";
 
     if (password !== adminPassword) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Remove _password from config before saving
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { _password: _pw, ...config } = body as LandingConfig & { _password?: string };
+    const config: LandingConfig = await request.json();
 
     if (isSupabaseConfigured()) {
       const supabase = getSupabase();
 
       // Try update first
-      const { error: updateError, count } = await supabase
+      const { error: updateError } = await supabase
         .from("landing_config")
         .update({ value: config, updated_at: new Date().toISOString() })
         .eq("key", "main");
 
-      // If update failed or no rows matched, try insert
-      if (updateError || count === 0) {
-        const { error: insertError } = await supabase
+      // If update failed, try upsert
+      if (updateError) {
+        const { error: upsertError } = await supabase
           .from("landing_config")
           .upsert({
             key: "main",
@@ -74,9 +71,9 @@ export async function PUT(request: NextRequest) {
             updated_at: new Date().toISOString(),
           });
 
-        if (insertError) {
+        if (upsertError) {
           return NextResponse.json(
-            { error: "Failed to save", detail: insertError.message, code: insertError.code },
+            { error: "Failed to save", detail: upsertError.message },
             { status: 500 }
           );
         }

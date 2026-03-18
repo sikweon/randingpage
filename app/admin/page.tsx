@@ -64,8 +64,9 @@ export default function AdminPage() {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
+          "x-admin-password": pw,
         },
-        body: JSON.stringify({ ...config, _password: pw }),
+        body: JSON.stringify(config),
       });
       if (res.ok) {
         showToast("저장 완료!");
