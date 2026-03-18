@@ -32,6 +32,8 @@ export async function GET(request: NextRequest) {
           hasError: !!error,
           errorMsg: error?.message,
           dataKeys: data ? Object.keys(data.value || {}) : [],
+          dataValueType: typeof data?.value,
+          rawValueSample: JSON.stringify(data?.value).substring(0, 200),
           url: process.env.NEXT_PUBLIC_SUPABASE_URL?.substring(0, 30),
         });
       }
