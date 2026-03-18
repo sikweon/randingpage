@@ -75,9 +75,8 @@ export async function PUT(request: NextRequest) {
           });
 
         if (insertError) {
-          console.error("Supabase save error:", insertError);
           return NextResponse.json(
-            { error: "Failed to save", detail: insertError.message },
+            { error: "Failed to save", detail: insertError.message, code: insertError.code },
             { status: 500 }
           );
         }
@@ -92,7 +91,10 @@ export async function PUT(request: NextRequest) {
     }
 
     return NextResponse.json({ success: true });
-  } catch {
-    return NextResponse.json({ error: "Failed to save" }, { status: 500 });
+  } catch (err) {
+    return NextResponse.json(
+      { error: "Failed to save", detail: String(err) },
+      { status: 500 }
+    );
   }
 }
