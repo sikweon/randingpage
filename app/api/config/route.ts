@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSupabase } from "@/lib/supabase";
 import { defaultConfig } from "@/lib/defaultConfig";
 import { LandingConfig } from "@/lib/types";
 import fs from "fs";
@@ -9,38 +8,34 @@ export const dynamic = "force-dynamic";
 
 const LOCAL_CONFIG_PATH = path.join(process.cwd(), "data", "config.json");
 
-function isSupabaseConfigured(): boolean {
+function getSupabaseInfo() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
-  return url.startsWith("http://") || url.startsWith("https://");
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+  const configured = url.startsWith("http://") || url.startsWith("https://");
+  return { url, key, configured };
 }
 
-export async function GET(request: NextRequest) {
-  const debug = request.nextUrl.searchParams.get("debug") === "1";
+export async function GET() {
   try {
-    if (isSupabaseConfigured()) {
-      const supabase = getSupabase();
-      const { data, error } = await supabase
-        .from("landing_config")
-        .select("value")
-        .eq("key", "main")
-        .single();
+    const sb = getSupabaseInfo();
+    if (sb.configured) {
+      const res = await fetch(
+        `${sb.url}/rest/v1/landing_config?key=eq.main&select=value`,
+        {
+          headers: {
+            apikey: sb.key,
+            Authorization: `Bearer ${sb.key}`,
+            Accept: "application/vnd.pgrst.object+json",
+          },
+          cache: "no-store",
+        }
+      );
 
-      if (debug) {
-        return NextResponse.json({
-          supabaseConfigured: true,
-          hasData: !!data,
-          hasError: !!error,
-          errorMsg: error?.message,
-          dataKeys: data ? Object.keys(data.value || {}) : [],
-          dataValueType: typeof data?.value,
-          rawValueSample: JSON.stringify(data?.value).substring(0, 200),
-          url: process.env.NEXT_PUBLIC_SUPABASE_URL?.substring(0, 30),
-          keyPrefix: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.substring(0, 20),
-        });
-      }
-
-      if (!error && data) {
-        return NextResponse.json(data.value as LandingConfig);
+      if (res.ok) {
+        const data = await res.json();
+        if (data?.value) {
+          return NextResponse.json(data.value as LandingConfig);
+        }
       }
     }
 
@@ -66,29 +61,50 @@ export async function PUT(request: NextRequest) {
     }
 
     const config: LandingConfig = await request.json();
+    const sb = getSupabaseInfo();
 
-    if (isSupabaseConfigured()) {
-      const supabase = getSupabase();
-
-      // Try update first
-      const { error: updateError } = await supabase
-        .from("landing_config")
-        .update({ value: config, updated_at: new Date().toISOString() })
-        .eq("key", "main");
-
-      // If update failed, try upsert
-      if (updateError) {
-        const { error: upsertError } = await supabase
-          .from("landing_config")
-          .upsert({
-            key: "main",
+    if (sb.configured) {
+      const res = await fetch(
+        `${sb.url}/rest/v1/landing_config?key=eq.main`,
+        {
+          method: "PATCH",
+          headers: {
+            apikey: sb.key,
+            Authorization: `Bearer ${sb.key}`,
+            "Content-Type": "application/json",
+            Prefer: "return=minimal",
+          },
+          body: JSON.stringify({
             value: config,
             updated_at: new Date().toISOString(),
-          });
+          }),
+        }
+      );
 
-        if (upsertError) {
+      if (!res.ok) {
+        // Try insert if update failed
+        const insertRes = await fetch(
+          `${sb.url}/rest/v1/landing_config`,
+          {
+            method: "POST",
+            headers: {
+              apikey: sb.key,
+              Authorization: `Bearer ${sb.key}`,
+              "Content-Type": "application/json",
+              Prefer: "resolution=merge-duplicates,return=minimal",
+            },
+            body: JSON.stringify({
+              key: "main",
+              value: config,
+              updated_at: new Date().toISOString(),
+            }),
+          }
+        );
+
+        if (!insertRes.ok) {
+          const err = await insertRes.text();
           return NextResponse.json(
-            { error: "Failed to save", detail: upsertError.message },
+            { error: "Failed to save", detail: err },
             { status: 500 }
           );
         }
