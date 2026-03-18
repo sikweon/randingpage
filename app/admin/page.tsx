@@ -678,6 +678,11 @@ export default function AdminPage() {
             value={config.seo?.ogUrl || ""}
             onChange={(v) => updateConfig("seo.ogUrl", v)}
           />
+          <TextInput
+            label="OG Type (og:type)"
+            value={config.seo?.ogType || "website"}
+            onChange={(v) => updateConfig("seo.ogType", v)}
+          />
           <p className="text-[10px] text-gray-400">
             * robots: noindex, nofollow 는 항상 고정 적용됩니다.
           </p>

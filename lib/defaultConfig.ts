@@ -106,5 +106,6 @@ export const defaultConfig: LandingConfig = {
     ogDescription: "당신의 일상에 특별한 경험을 더합니다",
     ogImage: "",
     ogUrl: "",
+    ogType: "website",
   },
 };

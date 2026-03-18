@@ -38,7 +38,7 @@ export default function LandingPage() {
     setMeta("og:description", seo?.ogDescription || seo?.description || "", true);
     setMeta("og:image", seo?.ogImage || "", true);
     setMeta("og:url", seo?.ogUrl || "", true);
-    setMeta("og:type", "website", true);
+    setMeta("og:type", seo?.ogType || "website", true);
   }, [config]);
 
   if (!config) {
