@@ -52,7 +52,8 @@ export async function PUT(request: NextRequest) {
     }
 
     // Remove _password from config before saving
-    const { _password, ...config } = body as LandingConfig & { _password?: string };
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { _password: _pw, ...config } = body as LandingConfig & { _password?: string };
 
     if (isSupabaseConfigured()) {
       const supabase = getSupabase();
