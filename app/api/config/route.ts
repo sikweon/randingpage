@@ -43,15 +43,16 @@ export async function GET() {
 
 export async function PUT(request: NextRequest) {
   try {
-    const password = request.headers.get("x-admin-password");
+    const body = await request.json();
+    const password = body._password || request.headers.get("x-admin-password");
     const adminPassword = process.env.ADMIN_PASSWORD || "zhdwmzhdwm!23";
 
     if (password !== adminPassword) {
-      console.error("Auth failed:", JSON.stringify({ received: password, expected: adminPassword }));
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const config: LandingConfig = await request.json();
+    // Remove _password from config before saving
+    const { _password, ...config } = body as LandingConfig & { _password?: string };
 
     if (isSupabaseConfigured()) {
       const supabase = getSupabase();
