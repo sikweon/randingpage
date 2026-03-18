@@ -16,7 +16,7 @@ body {
 }
 
 .featured-card {
-  padding: 1px;
+  padding: 2px;
   border-radius: 9px;
   background-size: 300% 300%;
   animation: gradSpin 2.5s ease infinite;
