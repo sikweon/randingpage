@@ -14,7 +14,8 @@ function isSupabaseConfigured(): boolean {
   return url.startsWith("http://") || url.startsWith("https://");
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const debug = request.nextUrl.searchParams.get("debug") === "1";
   try {
     if (isSupabaseConfigured()) {
       const supabase = getSupabase();
@@ -23,6 +24,17 @@ export async function GET() {
         .select("value")
         .eq("key", "main")
         .single();
+
+      if (debug) {
+        return NextResponse.json({
+          supabaseConfigured: true,
+          hasData: !!data,
+          hasError: !!error,
+          errorMsg: error?.message,
+          dataKeys: data ? Object.keys(data.value || {}) : [],
+          url: process.env.NEXT_PUBLIC_SUPABASE_URL?.substring(0, 30),
+        });
+      }
 
       if (!error && data) {
         return NextResponse.json(data.value as LandingConfig);
