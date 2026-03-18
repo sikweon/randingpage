@@ -35,6 +35,7 @@ export async function GET(request: NextRequest) {
           dataValueType: typeof data?.value,
           rawValueSample: JSON.stringify(data?.value).substring(0, 200),
           url: process.env.NEXT_PUBLIC_SUPABASE_URL?.substring(0, 30),
+          keyPrefix: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.substring(0, 20),
         });
       }
 
