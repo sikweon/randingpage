@@ -1,0 +1,83 @@
+{
+  "brand": {
+    "logo": "/images/1773734759058-yijc2p.jpg",
+    "name": "KONGZJUICE 공식스토어"
+  },
+  "header": {
+    "title": "누적 판매량 100만+ 누적 리뷰 10만+",
+    "badgeText1": "국내최초·국내유일",
+    "badgeText2": "타격감 특허, 맛 극대화 특허",
+    "bgColor": "#1a1a1a",
+    "badgeBg": "#ec4899",
+    "badgeBorderColor": "#ec4899",
+    "badgeTextColor1": "#ffffff",
+    "badgeTextColor2": "#ffffff"
+  },
+  "event": {
+    "label": "EVENT",
+    "deadline": "기한: 03월17일(화) 오후5시 마감",
+    "products": [
+      {
+        "id": 1,
+        "name": "3+1 골라담기",
+        "badge": "BEST",
+        "thumbnail": "/images/1773734772133-6qpbv2.jpg",
+        "discount": "57% 할인  3개사면 1개 무료!!",
+        "originalPrice": "26,000원",
+        "salePrice": "11,175원",
+        "link": "https://example.com/product1",
+        "featured": true,
+        "gradientIndex": 1
+      },
+      {
+        "id": 2,
+        "name": "2+1 골라담기",
+        "badge": "HOT",
+        "thumbnail": "/images/1773734777007-5bzm9j.jpg",
+        "discount": "50% 할인  2개사면 1개 무료!!",
+        "originalPrice": "18,000원",
+        "salePrice": "8,900원",
+        "link": "https://example.com/product2",
+        "featured": false,
+        "gradientIndex": 1
+      }
+    ],
+    "labelBg": "#dc2626",
+    "deadlineBg": "#c7c7c7",
+    "deadlineColor": "#000000"
+  },
+  "services": {
+    "label": "SERVICE & BRAND",
+    "items": [
+      {
+        "id": 1,
+        "icon": "/images/1773734780431-f86kkn.jpg",
+        "name": "안전 시험성적서",
+        "badge": "국내 최다보유",
+        "badgeBg": "#dcfce7",
+        "badgeColor": "#15803d",
+        "description": "안심하고 즐기세요!"
+      },
+      {
+        "id": 2,
+        "icon": "",
+        "name": "빠른 배송",
+        "badge": "당일발송",
+        "badgeBg": "#dbeafe",
+        "badgeColor": "#1d4ed8",
+        "description": "오후 2시 이전 주문 시 당일 발송"
+      }
+    ]
+  },
+  "footer": {
+    "awards": "고객 만족도 1위 | 재구매율 1위",
+    "copyright": "© 2025 REDILL Corp.",
+    "disclaimer": "※ 본 이벤트는 한정 수량으로 진행되며, 재고 소진 시 예고 없이 조기 종료될 수 있습니다."
+  },
+  "seo": {
+    "title": "콩즈쥬스",
+    "description": "당신의 일상에 특별한 경험을 더합니다",
+    "ogTitle": "콩즈쥬스 공식 스토어",
+    "ogDescription": "당신의 일상에 특별한 경험을 더합니다"
+  }
+}
