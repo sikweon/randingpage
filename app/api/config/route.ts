@@ -57,14 +57,30 @@ export async function PUT(request: NextRequest) {
 
     if (isSupabaseConfigured()) {
       const supabase = getSupabase();
-      const { error } = await supabase
+
+      // Try update first
+      const { error: updateError, count } = await supabase
         .from("landing_config")
         .update({ value: config, updated_at: new Date().toISOString() })
         .eq("key", "main");
 
-      if (error) {
-        console.error("Supabase error:", error);
-        return NextResponse.json({ error: "Failed to save" }, { status: 500 });
+      // If update failed or no rows matched, try insert
+      if (updateError || count === 0) {
+        const { error: insertError } = await supabase
+          .from("landing_config")
+          .upsert({
+            key: "main",
+            value: config,
+            updated_at: new Date().toISOString(),
+          });
+
+        if (insertError) {
+          console.error("Supabase save error:", insertError);
+          return NextResponse.json(
+            { error: "Failed to save", detail: insertError.message },
+            { status: 500 }
+          );
+        }
       }
     } else {
       // Fallback: write to local file
