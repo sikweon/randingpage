@@ -6,7 +6,7 @@ import { defaultConfig } from "@/lib/defaultConfig";
 import { GRADIENT_PRESETS } from "@/lib/gradients";
 
 export default function LandingPage() {
-  const [config, setConfig] = useState<LandingConfig>(defaultConfig);
+  const [config, setConfig] = useState<LandingConfig | null>(null);
 
   useEffect(() => {
     fetch("/api/config")
@@ -15,9 +15,9 @@ export default function LandingPage() {
       .catch(() => setConfig(defaultConfig));
   }, []);
 
-  const { brand, header, event, services, footer, seo } = config;
-
   useEffect(() => {
+    if (!config) return;
+    const seo = config.seo;
     if (seo?.title) document.title = seo.title;
 
     const setMeta = (name: string, content: string, property?: boolean) => {
@@ -39,7 +39,17 @@ export default function LandingPage() {
     setMeta("og:image", seo?.ogImage || "", true);
     setMeta("og:url", seo?.ogUrl || "", true);
     setMeta("og:type", "website", true);
-  }, [seo]);
+  }, [config]);
+
+  if (!config) {
+    return (
+      <div className="min-h-screen bg-[#f5f5f5] flex items-center justify-center">
+        <div className="w-8 h-8 border-3 border-gray-300 border-t-gray-600 rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  const { brand, header, event, services, footer } = config;
 
   return (
     <div className="min-h-screen bg-[#f5f5f5]">
