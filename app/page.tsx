@@ -247,16 +247,20 @@ function ProductCard({ product }: { product: Product }) {
     <div className="rounded-lg border border-gray-200">{inner}</div>
   );
 
-  return (
-    <a
-      href={product.link}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="block"
-    >
-      {cardContent}
-    </a>
-  );
+  if (product.linkEnabled !== false && product.link) {
+    return (
+      <a
+        href={product.link}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="block"
+      >
+        {cardContent}
+      </a>
+    );
+  }
+
+  return <div className="block">{cardContent}</div>;
 }
 
 function ServiceCard({ item }: { item: ServiceItem }) {

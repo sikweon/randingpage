@@ -339,6 +339,19 @@ export default function AdminPage() {
                   />
                   &gt; 버튼 표시
                 </label>
+                <label className="flex items-center gap-2 text-sm text-gray-700">
+                  <input
+                    type="checkbox"
+                    checked={product.linkEnabled !== false}
+                    onChange={(e) => {
+                      const products = [...config.event.products];
+                      products[idx] = { ...products[idx], linkEnabled: e.target.checked };
+                      updateConfig("event.products", products);
+                    }}
+                    className="rounded"
+                  />
+                  링크 클릭 활성화
+                </label>
               </div>
               <div className="grid grid-cols-[1fr_auto_auto] gap-2 items-end">
                 <TextInput
@@ -494,6 +507,7 @@ export default function AdminPage() {
                 featured: false,
                 gradientIndex: 0,
                 showArrow: true,
+                linkEnabled: true,
               };
               updateConfig("event.products", [...config.event.products, newProduct]);
             }}

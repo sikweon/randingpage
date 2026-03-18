@@ -19,6 +19,7 @@ export interface Product {
   featured: boolean;
   gradientIndex: number;
   showArrow: boolean;
+  linkEnabled: boolean;
 }
 
 export interface ServiceItem {

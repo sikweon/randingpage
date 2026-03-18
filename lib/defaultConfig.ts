@@ -44,6 +44,7 @@ export const defaultConfig: LandingConfig = {
         featured: true,
         gradientIndex: 1,
         showArrow: true,
+        linkEnabled: true,
       },
       {
         id: 2,
@@ -66,6 +67,7 @@ export const defaultConfig: LandingConfig = {
         featured: false,
         gradientIndex: 0,
         showArrow: true,
+        linkEnabled: true,
       },
     ],
   },
