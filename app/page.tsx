@@ -210,15 +210,17 @@ function ProductCard({ product }: { product: Product }) {
       </div>
 
       {/* Arrow */}
-      <div className="text-gray-300 flex-shrink-0">
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-          <path
-            fillRule="evenodd"
-            d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
-            clipRule="evenodd"
-          />
-        </svg>
-      </div>
+      {product.showArrow !== false && (
+        <div className="text-gray-500 flex-shrink-0">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+            <path
+              fillRule="evenodd"
+              d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
+              clipRule="evenodd"
+            />
+          </svg>
+        </div>
+      )}
     </div>
   );
 
@@ -226,8 +228,7 @@ function ProductCard({ product }: { product: Product }) {
     <div
       className="featured-card"
       style={{
-        background: GRADIENT_PRESETS[product.gradientIndex] || GRADIENT_PRESETS[0],
-        backgroundSize: "300% 300%",
+        backgroundImage: GRADIENT_PRESETS[product.gradientIndex] || GRADIENT_PRESETS[0],
       }}
     >
       {inner}

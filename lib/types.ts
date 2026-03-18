@@ -18,6 +18,7 @@ export interface Product {
   link: string;
   featured: boolean;
   gradientIndex: number;
+  showArrow: boolean;
 }
 
 export interface ServiceItem {

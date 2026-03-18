@@ -326,6 +326,19 @@ export default function AdminPage() {
                     className="border border-gray-200 rounded px-2 py-1 text-xs w-20"
                   />
                 )}
+                <label className="flex items-center gap-2 text-sm text-gray-700">
+                  <input
+                    type="checkbox"
+                    checked={product.showArrow !== false}
+                    onChange={(e) => {
+                      const products = [...config.event.products];
+                      products[idx] = { ...products[idx], showArrow: e.target.checked };
+                      updateConfig("event.products", products);
+                    }}
+                    className="rounded"
+                  />
+                  &gt; 버튼 표시
+                </label>
               </div>
               <div className="grid grid-cols-[1fr_auto_auto] gap-2 items-end">
                 <TextInput
@@ -480,6 +493,7 @@ export default function AdminPage() {
                 link: "",
                 featured: false,
                 gradientIndex: 0,
+                showArrow: true,
               };
               updateConfig("event.products", [...config.event.products, newProduct]);
             }}

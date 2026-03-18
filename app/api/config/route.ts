@@ -1,12 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { defaultConfig } from "@/lib/defaultConfig";
 import { LandingConfig } from "@/lib/types";
-import fs from "fs";
-import path from "path";
 
 export const dynamic = "force-dynamic";
-
-const LOCAL_CONFIG_PATH = path.join(process.cwd(), "data", "config.json");
 
 function getSupabaseInfo() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
@@ -39,12 +35,6 @@ export async function GET() {
       }
     }
 
-    // Fallback: read local file
-    if (fs.existsSync(LOCAL_CONFIG_PATH)) {
-      const raw = fs.readFileSync(LOCAL_CONFIG_PATH, "utf-8");
-      return NextResponse.json(JSON.parse(raw));
-    }
-
     return NextResponse.json(defaultConfig);
   } catch {
     return NextResponse.json(defaultConfig);
@@ -54,7 +44,7 @@ export async function GET() {
 export async function PUT(request: NextRequest) {
   try {
     const password = request.headers.get("x-admin-password");
-    const adminPassword = process.env.ADMIN_PASSWORD || "zhdwmzhdwm!23";
+    const adminPassword = process.env.ADMIN_PASSWORD || "zhdwmzhdwm23";
 
     if (password !== adminPassword) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -109,13 +99,6 @@ export async function PUT(request: NextRequest) {
           );
         }
       }
-    } else {
-      // Fallback: write to local file
-      const dir = path.dirname(LOCAL_CONFIG_PATH);
-      if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir, { recursive: true });
-      }
-      fs.writeFileSync(LOCAL_CONFIG_PATH, JSON.stringify(config, null, 2), "utf-8");
     }
 
     return NextResponse.json({ success: true });

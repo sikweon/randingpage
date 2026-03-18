@@ -43,6 +43,7 @@ export const defaultConfig: LandingConfig = {
         link: "https://example.com/product1",
         featured: true,
         gradientIndex: 0,
+        showArrow: true,
       },
       {
         id: 2,
@@ -64,6 +65,7 @@ export const defaultConfig: LandingConfig = {
         link: "https://example.com/product2",
         featured: false,
         gradientIndex: 1,
+        showArrow: true,
       },
     ],
   },
