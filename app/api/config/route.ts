@@ -56,10 +56,8 @@ export async function PUT(request: NextRequest) {
       const supabase = getSupabase();
       const { error } = await supabase
         .from("landing_config")
-        .upsert(
-          { id: 1, key: "main", value: config, updated_at: new Date().toISOString() },
-          { onConflict: "key" }
-        );
+        .update({ value: config, updated_at: new Date().toISOString() })
+        .eq("key", "main");
 
       if (error) {
         console.error("Supabase error:", error);
