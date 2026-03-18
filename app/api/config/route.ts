@@ -47,6 +47,7 @@ export async function PUT(request: NextRequest) {
     const adminPassword = process.env.ADMIN_PASSWORD || "zhdwmzhdwm!23";
 
     if (password !== adminPassword) {
+      console.error("Auth failed:", JSON.stringify({ received: password, expected: adminPassword }));
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
