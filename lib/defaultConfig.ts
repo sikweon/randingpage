@@ -107,5 +107,6 @@ export const defaultConfig: LandingConfig = {
     ogImage: "",
     ogUrl: "",
     ogType: "website",
+    customHead: "",
   },
 };

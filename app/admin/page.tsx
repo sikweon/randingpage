@@ -683,6 +683,21 @@ export default function AdminPage() {
             value={config.seo?.ogType || "website"}
             onChange={(v) => updateConfig("seo.ogType", v)}
           />
+          <div>
+            <label className="block text-xs font-medium text-gray-500 mb-1">
+              커스텀 Head 코드
+            </label>
+            <textarea
+              className="w-full border rounded-lg px-3 py-2 text-sm font-mono"
+              rows={6}
+              placeholder={"<!-- 메타 픽셀, 구글 태그 등 -->\n<script>...</script>\n<meta name=\"...\" content=\"...\"/>"}
+              value={config.seo?.customHead || ""}
+              onChange={(e) => updateConfig("seo.customHead", e.target.value)}
+            />
+            <p className="text-[10px] text-gray-400 mt-1">
+              * &lt;head&gt; 태그 안에 삽입할 HTML 코드를 입력하세요. (메타 픽셀, 구글 태그, 네이버 웹마스터 등)
+            </p>
+          </div>
           <p className="text-[10px] text-gray-400">
             * robots: noindex, nofollow 는 항상 고정 적용됩니다.
           </p>

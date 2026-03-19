@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import { defaultConfig } from "@/lib/defaultConfig";
 import LandingClient from "./LandingClient";
+import CustomHead from "./CustomHead";
 
 export const dynamic = "force-dynamic";
 
@@ -48,6 +49,14 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default function Page() {
-  return <LandingClient />;
+export default async function Page() {
+  const config = await getConfig();
+  const customHead = config.seo?.customHead || "";
+
+  return (
+    <>
+      <CustomHead html={customHead} />
+      <LandingClient />
+    </>
+  );
 }

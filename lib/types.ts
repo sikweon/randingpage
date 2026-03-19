@@ -73,5 +73,6 @@ export interface LandingConfig {
     ogImage: string;
     ogUrl: string;
     ogType: string;
+    customHead: string;
   };
 }
