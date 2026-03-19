@@ -11,12 +11,10 @@ export default function CustomHead({ html }: { html: string }) {
 
     const addedElements: Node[] = [];
 
-    // Process all child elements and add to <head>
     Array.from(container.children).forEach((el) => {
       const tagName = el.tagName.toLowerCase();
 
       if (tagName === "script") {
-        // Create a new script element to ensure execution
         const script = document.createElement("script");
         Array.from(el.attributes).forEach((attr) => {
           script.setAttribute(attr.name, attr.value);
@@ -27,14 +25,20 @@ export default function CustomHead({ html }: { html: string }) {
         document.head.appendChild(script);
         addedElements.push(script);
       } else {
-        // meta, link, style, noscript, etc.
         const clone = el.cloneNode(true);
         document.head.appendChild(clone);
         addedElements.push(clone);
       }
     });
 
-    // Cleanup on unmount
+    // Handle plain text nodes (comments, etc.)
+    const textOnly = html.replace(/<[^>]+>[\s\S]*?<\/[^>]+>/g, "").replace(/<[^>]+\/>/g, "").trim();
+    if (textOnly) {
+      const comment = document.createComment(textOnly);
+      document.head.appendChild(comment);
+      addedElements.push(comment);
+    }
+
     return () => {
       addedElements.forEach((el) => {
         if (el.parentNode) {
@@ -44,18 +48,6 @@ export default function CustomHead({ html }: { html: string }) {
     };
   }, [html]);
 
-  // Also render noscript content server-side for crawlers
-  if (!html) return null;
-
-  // Extract non-script tags for SSR (meta, link tags that crawlers need)
-  const nonScriptHtml = html.replace(/<script[\s\S]*?<\/script>/gi, "").trim();
-  if (!nonScriptHtml) return null;
-
-  return (
-    <div
-      dangerouslySetInnerHTML={{ __html: nonScriptHtml }}
-      style={{ display: "none" }}
-      suppressHydrationWarning
-    />
-  );
+  // No visible DOM output - everything goes to <head> via useEffect
+  return null;
 }
