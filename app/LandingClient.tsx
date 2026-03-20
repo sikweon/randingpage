@@ -5,8 +5,61 @@ import { LandingConfig, Product, ServiceItem } from "@/lib/types";
 import { defaultConfig } from "@/lib/defaultConfig";
 import { GRADIENT_PRESETS } from "@/lib/gradients";
 
+const TRACKING_PARAMS = [
+  "fbclid",
+  "utm_source",
+  "utm_medium",
+  "utm_campaign",
+  "utm_content",
+  "utm_term",
+  "utm_id",
+];
+
+function getTrackingParams(): Record<string, string> {
+  if (typeof window === "undefined") return {};
+  const url = new URL(window.location.href);
+  const params: Record<string, string> = {};
+  for (const key of TRACKING_PARAMS) {
+    const val = url.searchParams.get(key);
+    if (val) params[key] = val;
+  }
+  return params;
+}
+
+function appendTrackingToUrl(href: string, tracking: Record<string, string>): string {
+  if (Object.keys(tracking).length === 0) return href;
+  try {
+    const url = new URL(href);
+    for (const [key, val] of Object.entries(tracking)) {
+      if (!url.searchParams.has(key)) {
+        url.searchParams.set(key, val);
+      }
+    }
+    return url.toString();
+  } catch {
+    return href;
+  }
+}
+
+function applyTrackingToLinks(tracking: Record<string, string>) {
+  if (Object.keys(tracking).length === 0) return;
+  document.querySelectorAll<HTMLAnchorElement>("a[href]").forEach((a) => {
+    try {
+      const url = new URL(a.href);
+      if (url.hostname.includes("metavape.kr")) {
+        a.href = appendTrackingToUrl(a.href, tracking);
+      }
+    } catch { /* ignore invalid URLs */ }
+  });
+}
+
 export default function LandingClient() {
   const [config, setConfig] = useState<LandingConfig | null>(null);
+  const [tracking, setTracking] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    setTracking(getTrackingParams());
+  }, []);
 
   useEffect(() => {
     fetch("/api/config")
@@ -14,6 +67,19 @@ export default function LandingClient() {
       .then((data) => setConfig(data))
       .catch(() => setConfig(defaultConfig));
   }, []);
+
+  // Apply tracking params to all metavape.kr links after render
+  useEffect(() => {
+    if (!config || Object.keys(tracking).length === 0) return;
+    applyTrackingToLinks(tracking);
+
+    // MutationObserver for dynamically added links
+    const observer = new MutationObserver(() => {
+      applyTrackingToLinks(tracking);
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+    return () => observer.disconnect();
+  }, [config, tracking]);
 
   if (!config) {
     return (
@@ -99,7 +165,7 @@ export default function LandingClient() {
 
           <div className="mt-3 space-y-3">
             {event.products.map((product) => (
-              <ProductCard key={product.id} product={product} />
+              <ProductCard key={product.id} product={product} tracking={tracking} />
             ))}
           </div>
         </div>
@@ -130,7 +196,7 @@ export default function LandingClient() {
   );
 }
 
-function ProductCard({ product }: { product: Product }) {
+function ProductCard({ product, tracking }: { product: Product; tracking: Record<string, string> }) {
   const inner = (
     <div className="bg-white rounded-lg p-3 flex items-center gap-3">
       {/* Thumbnail */}
@@ -222,9 +288,10 @@ function ProductCard({ product }: { product: Product }) {
   );
 
   if (product.linkEnabled !== false && product.link) {
+    const finalHref = appendTrackingToUrl(product.link, tracking);
     return (
       <a
-        href={product.link}
+        href={finalHref}
         target="_blank"
         rel="noopener noreferrer"
         className="block"
