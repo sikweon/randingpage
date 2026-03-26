@@ -1,38 +1,12 @@
 import { Metadata } from "next";
-import { defaultConfig } from "@/lib/defaultConfig";
+import { getServerConfig } from "@/lib/getServerConfig";
 import LandingClient from "./LandingClient";
 import CustomHead from "./CustomHead";
 
 export const dynamic = "force-dynamic";
 
-async function getConfig() {
-  try {
-    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-    if (!url || !key) return defaultConfig;
-
-    const res = await fetch(
-      `${url}/rest/v1/landing_config?key=eq.main&select=value`,
-      {
-        headers: {
-          apikey: key,
-          Authorization: `Bearer ${key}`,
-        },
-        cache: "no-store",
-      }
-    );
-
-    if (!res.ok) return defaultConfig;
-    const data = await res.json();
-    if (data?.[0]?.value) return data[0].value;
-    return defaultConfig;
-  } catch {
-    return defaultConfig;
-  }
-}
-
 export async function generateMetadata(): Promise<Metadata> {
-  const config = await getConfig();
+  const config = await getServerConfig();
   const seo = config.seo;
 
   return {
@@ -50,7 +24,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Page() {
-  const config = await getConfig();
+  const config = await getServerConfig();
   const customHead = config.seo?.customHead || "";
 
   return (

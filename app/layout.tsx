@@ -1,28 +1,7 @@
 import "./globals.css";
+import { getServerConfig } from "@/lib/getServerConfig";
 
 export const dynamic = "force-dynamic";
-
-async function getCustomHead(): Promise<string> {
-  try {
-    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-    if (!url || !key) return "";
-
-    const res = await fetch(
-      `${url}/rest/v1/landing_config?key=eq.main&select=value`,
-      {
-        headers: { apikey: key, Authorization: `Bearer ${key}` },
-        cache: "no-store",
-      }
-    );
-
-    if (!res.ok) return "";
-    const data = await res.json();
-    return data?.[0]?.value?.seo?.customHead || "";
-  } catch {
-    return "";
-  }
-}
 
 function parseMetaTags(html: string): Array<{ name?: string; property?: string; content: string; httpEquiv?: string }> {
   const tags: Array<{ name?: string; property?: string; content: string; httpEquiv?: string }> = [];
@@ -51,10 +30,9 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const customHead = await getCustomHead();
+  const config = await getServerConfig();
+  const customHead = config.seo?.customHead || "";
   const customMetaTags = customHead ? parseMetaTags(customHead) : [];
-
-  // Check if there are script tags
   const scriptMatches = customHead ? customHead.match(/<script[\s\S]*?<\/script>/gi) || [] : [];
 
   return (
@@ -63,7 +41,6 @@ export default async function RootLayout({
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="robots" content="noindex, nofollow" />
-        {/* Custom meta tags from admin */}
         {customMetaTags.map((tag, i) => (
           <meta
             key={`custom-meta-${i}`}
@@ -73,21 +50,16 @@ export default async function RootLayout({
             content={tag.content}
           />
         ))}
-        {/* Custom script tags */}
         {scriptMatches.map((scriptHtml, i) => {
           const srcMatch = scriptHtml.match(/src=["']([^"']+)["']/);
           const innerContent = scriptHtml.replace(/<script[^>]*>|<\/script>/gi, "").trim();
           const asyncAttr = /\basync\b/i.test(scriptHtml);
 
           if (srcMatch) {
-            return (
-              <script key={`custom-script-${i}`} src={srcMatch[1]} async={asyncAttr} />
-            );
+            return <script key={`custom-script-${i}`} src={srcMatch[1]} async={asyncAttr} />;
           }
           if (innerContent) {
-            return (
-              <script key={`custom-script-${i}`} dangerouslySetInnerHTML={{ __html: innerContent }} />
-            );
+            return <script key={`custom-script-${i}`} dangerouslySetInnerHTML={{ __html: innerContent }} />;
           }
           return null;
         })}
