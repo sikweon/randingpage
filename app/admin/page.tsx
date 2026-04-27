@@ -181,11 +181,17 @@ export default function AdminPage() {
             value={config.event.label}
             onChange={(v) => updateConfig("event.label", v)}
           />
-          <TextInput
-            label="이벤트 기한"
-            value={config.event.deadline}
-            onChange={(v) => updateConfig("event.deadline", v)}
-          />
+          <div>
+            <TextInput
+              label="이벤트 기한"
+              value={config.event.deadline}
+              onChange={(v) => updateConfig("event.deadline", v)}
+            />
+            <p className="text-[11px] text-gray-400 mt-1 leading-relaxed">
+              💡 비워두면 매일 자동으로 <b>"오늘+1일"</b>로 표시됨 (예: 오늘 4/27 → "04월28일(화) 오후5시 마감").<br />
+              특정 날짜로 고정하려면 직접 입력 (예: <code>기한: 05월01일(금) 오후5시 마감</code>).
+            </p>
+          </div>
           <TextInput
             label="서비스 섹션 라벨"
             value={config.services.label}

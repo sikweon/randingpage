@@ -19,7 +19,7 @@ export const defaultConfig: LandingConfig = {
     label: "EVENT",
     labelBg: "#e01883",
     labelColor: "#ffffff",
-    deadline: "기한: 03월19일(목) 오후5시 마감",
+    deadline: "", // 빈 값 = 자동 계산 (오늘 + 1일). 수동 고정 원하면 어드민에서 직접 입력.
     deadlineBg: "#f2f2f2",
     deadlineColor: "#000000",
     products: [

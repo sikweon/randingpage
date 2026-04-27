@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { LandingConfig, Product, ServiceItem } from "@/lib/types";
 import { defaultConfig } from "@/lib/defaultConfig";
 import { GRADIENT_PRESETS } from "@/lib/gradients";
+import { resolveDeadlineText } from "@/lib/dynamicDeadline";
 
 const TRACKING_PARAMS = [
   "fbclid",
@@ -159,7 +160,7 @@ export default function LandingClient() {
               className="text-xs font-medium px-2 py-0.5 rounded"
               style={{ backgroundColor: event.deadlineBg || "transparent", color: event.deadlineColor || "#6b7280" }}
             >
-              {event.deadline}
+              {resolveDeadlineText(event.deadline)}
             </span>
           </div>
 
