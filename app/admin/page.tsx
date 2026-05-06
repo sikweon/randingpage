@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { LandingConfig, Product, ServiceItem } from "@/lib/types";
 import { defaultConfig } from "@/lib/defaultConfig";
 import { GRADIENT_PRESETS } from "@/lib/gradients";
@@ -79,19 +79,6 @@ export default function AdminPage() {
     setSaving(false);
   };
 
-  const uploadImage = useCallback(async (file: File): Promise<string> => {
-    const pw = sessionStorage.getItem("admin_pw") || "";
-    const formData = new FormData();
-    formData.append("file", file);
-    const res = await fetch("/api/upload", {
-      method: "POST",
-      headers: { "x-admin-password": pw },
-      body: formData,
-    });
-    const data = await res.json();
-    return data.url || "";
-  }, []);
-
   const updateConfig = (path: string, value: unknown) => {
     setConfig((prev) => {
       const next = JSON.parse(JSON.stringify(prev));
@@ -149,9 +136,7 @@ export default function AdminPage() {
           <ImageUploader
             label="로고 이미지"
             value={config.brand.logo}
-            onChange={(url) => updateConfig("brand.logo", url)}
-            onUpload={uploadImage}
-          />
+            onChange={(url) => updateConfig("brand.logo", url)}          />
           <TextInput
             label="브랜드명"
             value={config.brand.name}
@@ -275,9 +260,7 @@ export default function AdminPage() {
                   const products = [...config.event.products];
                   products[idx] = { ...products[idx], thumbnail: url };
                   updateConfig("event.products", products);
-                }}
-                onUpload={uploadImage}
-              />
+                }}              />
               <div className="grid grid-cols-[1fr_auto_auto] gap-2 items-end">
                 <TextInput
                   label="상품명"
@@ -548,9 +531,7 @@ export default function AdminPage() {
                   const items = [...config.services.items];
                   items[idx] = { ...items[idx], icon: url };
                   updateConfig("services.items", items);
-                }}
-                onUpload={uploadImage}
-              />
+                }}              />
               <TextInput
                 label="항목명"
                 value={item.name}
@@ -676,9 +657,7 @@ export default function AdminPage() {
           <ImageUploader
             label="OG 이미지 (og:image)"
             value={config.seo?.ogImage || ""}
-            onChange={(url) => updateConfig("seo.ogImage", url)}
-            onUpload={uploadImage}
-          />
+            onChange={(url) => updateConfig("seo.ogImage", url)}          />
           <TextInput
             label="OG URL (og:url)"
             value={config.seo?.ogUrl || ""}
@@ -856,28 +835,11 @@ function ImageUploader({
   label,
   value,
   onChange,
-  onUpload,
 }: {
   label: string;
   value: string;
   onChange: (url: string) => void;
-  onUpload: (file: File) => Promise<string>;
 }) {
-  const [uploading, setUploading] = useState(false);
-
-  const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setUploading(true);
-    try {
-      const url = await onUpload(file);
-      if (url) onChange(url);
-    } catch {
-      // upload failed silently
-    }
-    setUploading(false);
-  };
-
   return (
     <div>
       <label className="text-xs text-gray-500 mb-1 block">{label}</label>
@@ -888,16 +850,13 @@ function ImageUploader({
             <img src={value} alt="" className="w-full h-full object-cover" />
           </div>
         )}
-        <label className="cursor-pointer bg-gray-100 hover:bg-gray-200 text-gray-600 text-xs px-3 py-2 rounded-lg transition">
-          {uploading ? "업로드 중..." : "파일 선택"}
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleFile}
-            className="hidden"
-            disabled={uploading}
-          />
-        </label>
+        <input
+          type="url"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder="https://..."
+          className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
         {value && (
           <button
             onClick={() => onChange("")}
