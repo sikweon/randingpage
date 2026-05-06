@@ -1,31 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { LandingConfig, Product, ServiceItem } from "@/lib/types";
-import { defaultConfig } from "@/lib/defaultConfig";
 import { GRADIENT_PRESETS } from "@/lib/gradients";
 import { resolveDeadlineText } from "@/lib/dynamicDeadline";
-
-const TRACKING_PARAMS = [
-  "fbclid",
-  "utm_source",
-  "utm_medium",
-  "utm_campaign",
-  "utm_content",
-  "utm_term",
-  "utm_id",
-];
-
-function getTrackingParams(): Record<string, string> {
-  if (typeof window === "undefined") return {};
-  const url = new URL(window.location.href);
-  const params: Record<string, string> = {};
-  for (const key of TRACKING_PARAMS) {
-    const val = url.searchParams.get(key);
-    if (val) params[key] = val;
-  }
-  return params;
-}
 
 function appendTrackingToUrl(href: string, tracking: Record<string, string>): string {
   if (Object.keys(tracking).length === 0) return href;
@@ -54,41 +32,26 @@ function applyTrackingToLinks(tracking: Record<string, string>) {
   });
 }
 
-export default function LandingClient() {
-  const [config, setConfig] = useState<LandingConfig | null>(null);
-  const [tracking, setTracking] = useState<Record<string, string>>({});
+export default function LandingClient({
+  initialConfig,
+  initialTracking,
+}: {
+  initialConfig: LandingConfig;
+  initialTracking: Record<string, string>;
+}) {
+  const config = initialConfig;
+  const tracking = initialTracking;
 
+  // Backup: ensure dynamically added links also get tracking
   useEffect(() => {
-    setTracking(getTrackingParams());
-  }, []);
-
-  useEffect(() => {
-    fetch("/api/config")
-      .then((res) => res.json())
-      .then((data) => setConfig(data))
-      .catch(() => setConfig(defaultConfig));
-  }, []);
-
-  // Apply tracking params to all metavape.kr links after render
-  useEffect(() => {
-    if (!config || Object.keys(tracking).length === 0) return;
+    if (Object.keys(tracking).length === 0) return;
     applyTrackingToLinks(tracking);
-
-    // MutationObserver for dynamically added links
     const observer = new MutationObserver(() => {
       applyTrackingToLinks(tracking);
     });
     observer.observe(document.body, { childList: true, subtree: true });
     return () => observer.disconnect();
-  }, [config, tracking]);
-
-  if (!config) {
-    return (
-      <div className="min-h-screen bg-[#f5f5f5] flex items-center justify-center">
-        <div className="w-8 h-8 border-3 border-gray-300 border-t-gray-600 rounded-full animate-spin" />
-      </div>
-    );
-  }
+  }, [tracking]);
 
   const { brand, header, event, services, footer } = config;
 
